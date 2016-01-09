@@ -31,3 +31,4 @@
 *.suo
 Debug/
 Release/
+build/
