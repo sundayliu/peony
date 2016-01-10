@@ -1,0 +1,15 @@
+add_library(foo foo.cpp)
+add_executable(hello main.cpp)
+target_link_libraries(hello foo)
+
+if (test)
+    add_subdirectory(gtest)
+    enable_testing()
+    include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+    
+    add_executable(foo_unittest foo_unittest.cpp)
+    target_link_libraries(foo_unittest gtest gtest_main)
+    target_link_libraries(foo_unittest foo)
+    add_test(NAME that-test-I-made COMMAND foo_unittest)
+    add_test(that-other-test-I-made foo_unittest)
+endif()
