@@ -1,0 +1,15 @@
+add_library(cert  pkcs7.cpp)
+#add_executable(hello main.cpp)
+#target_link_libraries(hello foo)
+
+if (test)
+    add_subdirectory(gtest)
+    enable_testing()
+    include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+    
+    add_executable(unittest pkcs7_unittest.cpp)
+    target_link_libraries(unittest gtest gtest_main)
+    target_link_libraries(unittest cert)
+    add_test(NAME that-test-I-made COMMAND unittest)
+    add_test(that-other-test-I-made unittest)
+endif()
