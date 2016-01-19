@@ -1,0 +1,82 @@
+DER格式采用ASN1的DER标准格式
+
+openssl pkcs7 [-inform PEM|DER] [-outform PEM|DER] [-in filename]
+    [-out filename] [-print_certs] [-text] [-noout] 
+    
+PKCS #7
+
+.p7b/.p7r
+加密信息语法标准
+1、p7b以树状展示证书链，不含私钥
+2、p7r为CA对证书请求签名的，只能用于导入
+CMS
+.p7c/.p7m/.p7s
+1、p7c只保存证书
+2、p7m：signature with enveloped data
+3、p7s：时间戳签名文件
+    Cryptographic Message Syntax Standard
+    A PKCS #7 file can be used to store certificates, which is a SignedData structure without data (just the certificates). The file name extension is usually .p7b, .p7c
+
+    
+PKCS #8
+    Private-Key Information Syntax Standard.
+    Used to carry private certificate keypairs (encrypted or unencrypted).
+PKCS #12
+    Personal Information Exchange Syntax Standard.
+    Defines a file format commonly used to store private keys with accompanying public key certificates, protected with a password-based symmetric key. It is the successor to PFX from Microsoft
+DER
+    Distinguished Encoding Rules
+    A binary format for keys or certificates. It is a message transfer syntax specified by the ITU in X.690.
+PEM
+    Privacy Enhanced Mail
+    
+RSA Public Key file (PKCS#1)
+Public Key file (PKCS#8)
+RSA Private Key file (PKCS#1)
+Private Key file (PKCS#8)
+
+ContentInfo ::=SEQUENCE{
+    contentType ContentType,
+    content
+        [0] EXPLICIT ANY DEFINED BY contentType OPTIONAL
+}
+
+
+每一行的开始是对象在文件里的偏移量
+d=xx是结构嵌套的深度。知道ASN1结构的人应该知道，每一个SET或者SEQUENCE都会让嵌套深度增加1.  
+    hl=xx表示当前类型的header的长度。1=xx表示内容的八进制的长度
+    
+    
+FooProtocol DEFINITIONS ::= BEGIN
+
+    FooQuestion ::= SEQUENCE {
+        trackingNumber INTEGER,
+        question       IA5String
+    }
+
+    FooAnswer ::= SEQUENCE {
+        questionNumber INTEGER,
+        answer         BOOLEAN
+    }
+
+END
+
+myQuestion FooQuestion ::= {
+    trackingNumber     5,
+    question           "Anybody there?"
+}
+
+Example encoded in DER
+
+30 — type tag indicating SEQUENCE
+13 — length in octets of value that follows
+02 — type tag indicating INTEGER
+01 — length in octets of value that follows
+05 — value (5)
+16 — type tag indicating IA5String 
+     (IA5 means the full 7-bit ISO 646 set, including variants, 
+      but is generally US-ASCII)
+0e — length in octets of value that follows
+41 6e 79 62 6f 64 79 20 74 68 65 72 65 3f — value ("Anybody there?")
+
+30 13 02 01 05 16 0e 41 6e 79 62 6f 64 79 20 74 68 65 72 65 3f

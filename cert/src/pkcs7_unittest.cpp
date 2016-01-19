@@ -7,7 +7,10 @@
 #include "gtest/gtest.h"
 #include <iostream>
 
+using namespace std;
+
 TEST(IndependentMethod, ResetsZero){
+    //cout << "Hello" << endl;
     int i = 0;
     EXPECT_EQ(0, i);
     
@@ -23,11 +26,14 @@ TEST(IndependentMethod, ResetsZero2){
 class PKCS7Test:public ::testing::Test{
 protected:
     PKCS7Test(){
-        
+        m_pkcs7 = new tp::crypto::PKCS7("../data/test.RSA");
     }
     
     virtual ~PKCS7Test(){
-        
+        if (m_pkcs7 != NULL){
+            delete m_pkcs7;
+            m_pkcs7 = NULL;
+        }
     }
     
     virtual void SetUp(){
@@ -38,7 +44,7 @@ protected:
         
     }
     
-    tp::crypto::PKCS7 m_pkcs7;
+    tp::crypto::PKCS7* m_pkcs7;
 };
 
 TEST_F(PKCS7Test, MethodExample){
