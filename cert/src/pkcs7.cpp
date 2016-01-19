@@ -9,11 +9,21 @@
 #include <string.h>
 #include <errno.h>
 
+
+/*
+1.2.840.113549.1.7.1 - data
+1.2.840.113549.1.7.2 - signedData
+1.2.840.113549.1.7.3 - envelopedData
+1.2.840.113549.1.7.4 - signedAndEnvelopedData
+1.2.840.113549.1.7.5 - digestedData
+1.2.840.113549.1.7.6 - encryptedData
+*/
+
 namespace tp{
 namespace crypto{
 
-#define ASN1_TAG_CLASS_UNIVERSAL 0x000
-#define ASN1_TAG_CLASS_APPLICATION 0x040
+#define ASN1_TAG_CLASS_UNIVERSAL 0x000     // UNIVERSAL的Tag是ASN.1标准定义的，给每一种内建类型定义一个固定tag值
+#define ASN1_TAG_CLASS_APPLICATION 0x040   // APPLICATION的Tag，唯一标志应用内的一个类型,但是因为使用IMPORTS等方式下，很难保证唯一性，所以这种Tag类已经不推荐使用了 Order-number ::= [APPLICATION 0] NumericString
 #define ASN1_TAG_CLASS_CONTEXT 0x080
 #define ASN1_TAG_CLASS_PRIVATE 0x0C0
 
@@ -52,18 +62,74 @@ public:
     uint32_t getLength(){return m_length;}
     
 public:
+    bool isConstructed(uint8_t tag){
+        return ((tag & 0x20) == 0x20);
+    }
+    
+    bool isContextSpecific(uint8_t tag){
+        return ((tag & 0x0c0) == 0x080);
+    }
+    
+public:
     static bool encodeLength(int value, uint8_t* outdata, size_t& outlen);
-    static uint32_t decodeLength(const uint8_t* data, size_t len);
+    static uint32_t decodeLength(const uint8_t* data, size_t len, size_t& outlen);
     
 private:
-    bool decode_boolean(const uint8_t* in, size_t inlen, bool& out, uint32_t& outlen);
-    bool decode_sequence(const uint8_t* in, size_t inlen, uint32_t& outlen);
+    bool decodeBoolean(const uint8_t* in, size_t inlen, bool& out, uint32_t& outlen);
+    bool decodeSequence(const uint8_t* in, size_t inlen, uint32_t& outlen);
+    bool decodeObjectIdentifier(const uint8_t* in, size_t inlen){
+        uint32_t cur_idx = 1;
+        uint32_t body_length = 0;
+        size_t header_length = 0;
+        body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
+        printf("body|header:%d|%lu\n", body_length, header_length);
+        
+        unsigned y = 0;
+        unsigned t = 0;
+        cur_idx += header_length;
+        m_current_idx += header_length + 1 + body_length;
+        unsigned long* words = new unsigned long[body_length];
+        while(body_length--){
+            t = (t << 7) | (in[cur_idx] & 0x7F);
+            if (!(in[cur_idx++] & 0x80)){
+                // <= 0x7F
+                if (y == 0){
+                    words[0] = t / 40;
+                    words[1] = t % 40;
+                    y = 2;
+                }
+                else{
+                    words[y++] = t;
+                }
+                t = 0;
+            }
+            else{
+                // continue;
+            }
+        }
+        
+        unsigned i = 0;
+        printf("value:");
+        for (i = 0; i < y; i++){
+            printf("%lu", words[i]);
+            if (i < y -1){
+                printf(".");
+            }
+            else{
+                printf("\n");
+            }
+        }
+        
+        delete[] words;
+        return true;
+    }
     
 private:
     uint8_t m_tag;
     uint32_t m_length;
     uint8_t* m_buffer;
     size_t m_buffer_size;
+    size_t m_current_idx;
     
 };
 
@@ -90,7 +156,13 @@ DerValue::~DerValue(){
     }
 }
 
-bool DerValue::decode_boolean(const uint8_t* in, size_t inlen, bool& out, uint32_t& outlen){
+bool DerValue::decodeBoolean(const uint8_t* in, size_t inlen, bool& out, uint32_t& outlen){
+    return true;
+}
+
+bool DerValue::decodeSequence(const uint8_t* in, size_t inlen, uint32_t& outlen){
+    //size_t header_length = 0;
+    //uint32_t body_length = decodeLength(in, inlen, header_length);
     return true;
 }
 
@@ -99,27 +171,68 @@ bool DerValue::decode(){
         return false;
     }
     
-    size_t cur_idx = 0;
-    m_tag = m_buffer[cur_idx++];
-    switch(m_tag){
-    case ASN1_TAG_BOOLEAN:
-        break;
-    case ASN1_TAG_SEQUENCE:
-    case ASN1_TAG_SEQUENCEOF:
-        break;
-    case ASN1_TAG_SET:
-    case ASN1_TAG_SETOF:
-        break;
-    default:
-        printf("!error, Not recognize tag:%d\n", m_tag);
-        break;
+    m_current_idx = 0;
+    bool parse_fail = false;
+    while(m_current_idx < m_buffer_size){
+        m_tag = m_buffer[m_current_idx];
+        size_t header_length = 0;
+        uint32_t body_length = 0;
+        switch(m_tag){
+        case ASN1_TAG_BOOLEAN:
+            printf("BOOLEAN\n");
+            parse_fail = true;
+            break;
+        case ASN1_TAG_INTEGER:
+            break;
+        case ASN1_TAG_BITSTRING:
+            break;
+        case ASN1_TAG_OCTESTRING:
+            break;
+        case ASN1_TAG_NULL:
+            break;
+        case ASN1_TAG_OBJECTID:
+            printf("Object Identifier\n");
+            decodeObjectIdentifier(m_buffer + m_current_idx, m_buffer_size - m_buffer_size);
+            break;
+        case ASN1_TAG_ENUMERATED:
+            break;
+        case ASN1_TAG_SEQUENCE:
+        //case ASN1_TAG_SEQUENCEOF:
+            printf("SEQUENCE\n");
+            body_length = decodeLength(m_buffer + m_current_idx + 1, m_buffer_size - m_current_idx - 1, header_length);
+            printf("body|header:%u|%lu\n", body_length, header_length + 1);
+            m_current_idx += header_length + 1;
+            break;
+        case ASN1_TAG_SET:
+        //case ASN1_TAG_SETOF:
+            printf("SET\n");
+            parse_fail = true;
+            break;
+        default:
+            if (isConstructed(m_tag)){
+                body_length = decodeLength(m_buffer + m_current_idx + 1, m_buffer_size - m_current_idx - 1, header_length);
+                printf("constructed[%d]\n", m_tag & 0x20);
+                printf("body|header:%u|%lu\n", body_length, header_length);
+                m_current_idx += header_length + 1;
+            }
+            else{
+                printf("!error, Not recognize tag:%d\n", m_tag);
+                parse_fail = true;
+            }
+            
+            break;
+        }
+        
+        if (parse_fail){
+            break;
+        }
     }
     
     return true;
 }
     
 
-uint32_t DerValue::decodeLength(const uint8_t* data, size_t len){
+uint32_t DerValue::decodeLength(const uint8_t* data, size_t len, size_t& outlen){
     if (data == NULL || len <= 0){
         return -1;
     }
@@ -150,6 +263,8 @@ uint32_t DerValue::decodeLength(const uint8_t* data, size_t len){
         }
     }
     
+    
+    outlen = cur_idx;
     return value;
 }
 

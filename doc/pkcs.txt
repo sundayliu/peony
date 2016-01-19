@@ -80,3 +80,52 @@ Example encoded in DER
 41 6e 79 62 6f 64 79 20 74 68 65 72 65 3f — value ("Anybody there?")
 
 30 13 02 01 05 16 0e 41 6e 79 62 6f 64 79 20 74 68 65 72 65 3f
+
+Superior references
+
+1.2.840.113549.1 - PKCS
+1.2.840.113549 - RSADSI
+1.2.840 - USA
+1.2 - ISO member body
+1 - ISO assigned OIDs
+Top of OID tree
+Subsidiary references (single level)
+
+1.2.840.113549.1.7.1 - data
+1.2.840.113549.1.7.2 - signedData
+1.2.840.113549.1.7.3 - envelopedData
+1.2.840.113549.1.7.4 - signedAndEnvelopedData
+1.2.840.113549.1.7.5 - digestedData
+1.2.840.113549.1.7.6 - encryptedData
+
+只能出现在SEQUENCE、SET和CHOICE类型的组件中，如果这些结构类型本身也是另一个结构类型的组件，也可以使用。只要不产生歧义，相同的tag数值可以在不同结构中反复使用。
+	A-possible-type ::= SET 
+	{
+		integer 			[0] CHOICE 
+		{
+			a 		[0] INTEGER,
+			b 		[1] INTEGER 
+		},
+		boolean [1] CHOICE 
+		{
+			a 		[0] BOOLEAN,
+			b 		[1] BOOLEAN
+		}
+	}
+    
+    
+    如果没有明确地写明tag类，也默认为是context-specific: 
+如 Number ::= [0] INTEGER
+context-specific是目前最广泛应用的tag class。
+
+private tag，在一家公司或一个国家内唯一标志一个类型，如某公司可能这样扩展传输层PDU：
+	RejectTPDU ::= SET 
+	{
+		destRef 			[0] Reference,
+		yr-tu-nr 			[1] TPDUnumber,
+		credit 				[2] Credit,
+		extended 			[PRIVATE 0] BOOLEAN DEFAULT FALSE 
+	}
+PRIVATE类的Tag现在也不推荐使用。
+
+结构类型的tag类与他们组件的tag类没有必然关系
