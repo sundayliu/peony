@@ -183,18 +183,60 @@ bool DerValue::decode(){
             parse_fail = true;
             break;
         case ASN1_TAG_INTEGER:
+            printf("INTEGER\n");
+            parse_fail = true;
             break;
         case ASN1_TAG_BITSTRING:
+            printf("BITSTRINE\n");
+            parse_fail = true;
             break;
         case ASN1_TAG_OCTESTRING:
+            printf("OCTESTRING\n");
+            parse_fail = true;
             break;
         case ASN1_TAG_NULL:
+            printf("NULL\n");
+            parse_fail = true;
             break;
         case ASN1_TAG_OBJECTID:
             printf("Object Identifier\n");
             decodeObjectIdentifier(m_buffer + m_current_idx, m_buffer_size - m_buffer_size);
             break;
         case ASN1_TAG_ENUMERATED:
+            printf("ENUMERATED\n");
+            parse_fail = true;
+            break;
+        case ASN1_TAG_UTF8STRING:
+            printf("UTF8STRING\n");
+            parse_fail = true;
+            break;
+        case ASN1_TAG_PRINTABLESTRING:
+            printf("PRINTABLESTRING\n");
+            parse_fail = true;
+            break;
+        case ASN1_TAG_T61STRING:
+            printf("T61STRING\n");
+            parse_fail = true;
+            break;
+        case ASN1_TAG_IA5STRING:
+            printf("IA5STRING\n");
+            parse_fail = true;
+            break;
+        case ASN1_TAG_UTCTIME:
+            printf("UTCTIME\n");
+            parse_fail = true;
+            break;
+        case ASN1_TAG_GENERALIZEDTIME:
+            printf("GENERALIZEDTIME\n");
+            parse_fail = true;
+            break;
+        case ASN1_TAG_UNIVERALSTRING:
+            printf("UNIVERSALSTRING\n");
+            parse_fail = true;
+            break;
+        case ASN1_TAG_BMPSTRING:
+            printf("BMPSTRING\n");
+            parse_fail = true;
             break;
         case ASN1_TAG_SEQUENCE:
         //case ASN1_TAG_SEQUENCEOF:
