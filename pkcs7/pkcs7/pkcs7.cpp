@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <map>
+#include <string>
 
 
 /*
@@ -18,6 +20,21 @@
 1.2.840.113549.1.7.5 - digestedData
 1.2.840.113549.1.7.6 - encryptedData
 */
+
+std::map<std::string, std::string> OID_MAP = {
+  { "1.2.840.113549.1.7.2", "pkcs7-signedData" },
+  {"1.2.840.113549.1.7.1", "pkcs7-data"},
+  {"1.3.14.3.2.26", "sha1"},
+  { "1.2.840.113549.1.1.11", "sha256WithRSAEncryption" },
+  {"2.5.4.6", "countryName" },
+  { "2.5.4.8", "stateOrProvinceName" },
+  { "2.5.4.7", "localityName" },
+  { "2.5.4.10", "organizationName" },
+  { "2.5.4.11", "organizationalUnitName" },
+  { "2.5.4.3", "commonName" },
+  { "1.2.840.113549.1.1.1", "RSA encryption" },
+  {"2.5.29.14", "X509v3 Subject Key Identifier"}
+};
 
 namespace tp{
 namespace crypto{
@@ -49,6 +66,162 @@ namespace crypto{
 #define ASN1_TAG_SET                    0x31
 #define ASN1_TAG_SETOF                  0x31
 
+// IA5 table
+static const struct {
+    int code, value;
+} ia5_table[] = {
+    { '\0', 0 },
+    { '\a', 7 },
+    { '\b', 8 },
+    { '\t', 9 },
+    { '\n', 10 },
+    { '\f', 12 },
+    { '\r', 13 },
+    { ' ', 32 },
+    { '!', 33 },
+    { '"', 34 },
+    { '#', 35 },
+    { '$', 36 },
+    { '%', 37 },
+    { '&', 38 },
+    { '\'', 39 },
+    { '(', 40 },
+    { ')', 41 },
+    { '*', 42 },
+    { '+', 43 },
+    { ',', 44 },
+    { '-', 45 },
+    { '.', 46 },
+    { '/', 47 },
+    { '0', 48 },
+    { '1', 49 },
+    { '2', 50 },
+    { '3', 51 },
+    { '4', 52 },
+    { '5', 53 },
+    { '6', 54 },
+    { '7', 55 },
+    { '8', 56 },
+    { '9', 57 },
+    { ':', 58 },
+    { ';', 59 },
+    { '<', 60 },
+    { '=', 61 },
+    { '>', 62 },
+    { '?', 63 },
+    { '@', 64 },
+    { 'A', 65 },
+    { 'B', 66 },
+    { 'C', 67 },
+    { 'D', 68 },
+    { 'E', 69 },
+    { 'F', 70 },
+    { 'G', 71 },
+    { 'H', 72 },
+    { 'I', 73 },
+    { 'J', 74 },
+    { 'K', 75 },
+    { 'L', 76 },
+    { 'M', 77 },
+    { 'N', 78 },
+    { 'O', 79 },
+    { 'P', 80 },
+    { 'Q', 81 },
+    { 'R', 82 },
+    { 'S', 83 },
+    { 'T', 84 },
+    { 'U', 85 },
+    { 'V', 86 },
+    { 'W', 87 },
+    { 'X', 88 },
+    { 'Y', 89 },
+    { 'Z', 90 },
+    { '[', 91 },
+    { '\\', 92 },
+    { ']', 93 },
+    { '^', 94 },
+    { '_', 95 },
+    { '`', 96 },
+    { 'a', 97 },
+    { 'b', 98 },
+    { 'c', 99 },
+    { 'd', 100 },
+    { 'e', 101 },
+    { 'f', 102 },
+    { 'g', 103 },
+    { 'h', 104 },
+    { 'i', 105 },
+    { 'j', 106 },
+    { 'k', 107 },
+    { 'l', 108 },
+    { 'm', 109 },
+    { 'n', 110 },
+    { 'o', 111 },
+    { 'p', 112 },
+    { 'q', 113 },
+    { 'r', 114 },
+    { 's', 115 },
+    { 't', 116 },
+    { 'u', 117 },
+    { 'v', 118 },
+    { 'w', 119 },
+    { 'x', 120 },
+    { 'y', 121 },
+    { 'z', 122 },
+    { '{', 123 },
+    { '|', 124 },
+    { '}', 125 },
+    { '~', 126 }
+};
+
+static int der_ia5_char_encode(int c){
+    int x;
+    for (x = 0; x < (int)(sizeof(ia5_table) / sizeof(ia5_table[0])); x++) {
+        if (ia5_table[x].code == c) {
+            return ia5_table[x].value;
+        }
+    }
+    return -1;
+}
+
+static int der_ia5_value_decode(int v){
+    int x;
+    for (x = 0; x < (int)(sizeof(ia5_table) / sizeof(ia5_table[0])); x++) {
+        if (ia5_table[x].value == v) {
+            return ia5_table[x].code;
+        }
+    }
+    return -1;
+}
+
+static int char_to_int(unsigned char x)
+{
+    switch (x)  {
+    case '0': return 0;
+    case '1': return 1;
+    case '2': return 2;
+    case '3': return 3;
+    case '4': return 4;
+    case '5': return 5;
+    case '6': return 6;
+    case '7': return 7;
+    case '8': return 8;
+    case '9': return 9;
+    }
+    return 100;
+}
+
+typedef struct{
+    uint32_t YY;
+    uint32_t MM;
+    uint32_t DD;
+    uint32_t hh;
+    uint32_t mm;
+    uint32_t ss;
+    uint32_t off_dir; // 0 == + 1 == -
+    uint32_t off_hh;  // timezone offset hours
+    uint32_t off_mm;
+}tp_utctime;
     
 class DerValue{
 public:
@@ -76,6 +249,135 @@ public:
     
 private:
     bool decodeBoolean(const uint8_t* in, size_t inlen, bool& out, uint32_t& outlen);
+    bool decodeUTCTime(const uint8_t* in, size_t inlen){
+        uint32_t cur_idx = 1;
+        uint32_t body_length = 0;
+        size_t header_length = 0;
+        body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
+        printf("offset=%lu h=%lu l=%u:UTCTime\n", m_current_idx, header_length + 1, body_length);
+        {
+            // parse utc time
+            uint8_t buf[32] = { 0 };
+            tp_utctime utctime;
+            for (uint32_t i = 0; i < body_length; i++){
+                buf[i] = der_ia5_value_decode(in[header_length+1+i]);
+            }
+
+#define DECODE_V(y, max) \
+    y = char_to_int(buf[i]) * 10 + char_to_int(buf[i+1]); \
+    i += 2;
+
+            // YYMMDDhhmmZ
+            //YYMMDDhhmm + hh'mm'
+            //    YYMMDDhhmm - hh'mm'
+            //    YYMMDDhhmmssZ
+            //    YYMMDDhhmmss + hh'mm'
+            //    YYMMDDhhmmss - hh'mm'
+            uint32_t i = 0;
+            DECODE_V(utctime.YY, 100);
+            DECODE_V(utctime.MM, 13);
+            DECODE_V(utctime->DD, 32);
+            DECODE_V(utctime.hh, 24);
+            DECODE_V(utctime.mm, 60);
+            if (buf[i] == 'Z'){
+                // end
+            }
+            else if (buf[i] == '+' || buf[i] == '-'){
+                utctime.off_dir = (buf[i++] == '+') ? 0 : 1;
+                DECODE_V(utctime.off_hh, 24);
+                DECODE_V(utctime.off_mm, 60);
+            }
+            else{
+                DECODE_V(utctime.ss, 60);
+                if (buf[i] == 'Z'){
+                    // end;
+                }
+                else if (buf[i] == '+' || buf[i] == '-'){
+                    utctime.off_dir = (buf[i++] == '+') ? 0 : 1;
+                    DECODE_V(utctime.off_hh, 24);
+                    DECODE_V(utctime.off_mm, 60);
+                }
+            }
+        }
+
+        cur_idx += header_length;
+        m_current_idx += header_length + 1 + body_length;
+        return true;
+    }
+    bool decodePrintableString(const uint8_t* in, size_t inlen){
+        uint32_t cur_idx = 1;
+        uint32_t body_length = 0;
+        size_t header_length = 0;
+        body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
+        
+        
+        printf("offset=%lu h=%lu l=%u:", m_current_idx, header_length + 1, body_length);
+        for (uint32_t i = 0; i < body_length; i++){
+            printf("%c", in[header_length + 1 + i]);
+        }
+
+        printf(":PRINTABLESTRING\n");
+
+
+        cur_idx += header_length;
+        m_current_idx += header_length + 1 + body_length;
+        return true;
+    }
+
+    bool decodeBitString(const uint8_t* in, size_t inlen){
+        uint32_t cur_idx = 1;
+        uint32_t body_length = 0;
+        size_t header_length = 0;
+        body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
+        printf("offset=%lu h=%lu l=%u:BITSTRING\n", m_current_idx, header_length + 1, body_length);
+
+        cur_idx += header_length;
+        m_current_idx += header_length + 1 + body_length;
+        return true;
+    }
+
+    bool decodeOctetString(const uint8_t* in, size_t inlen){
+        uint32_t cur_idx = 1;
+        uint32_t body_length = 0;
+        size_t header_length = 0;
+        body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
+        printf("offset=%lu h=%lu l=%u:OCTET STRING\n", m_current_idx, header_length + 1, body_length);
+
+        uint32_t count = body_length / 16;
+        uint32_t remain = body_length % 16;
+        for (uint32_t i = 0; i < count; i++){
+            printf("\t");
+            for (uint32_t j = 0; j < 16; j++){
+                printf("%02X ", in[header_length + 1 + 16 * i + j]);
+            }
+            printf("\n");
+        }
+
+        printf("\t");
+        for (uint32_t j = 0; j < remain; j++){
+            //printf("\t");
+            printf("%02X ", in[header_length + 1 + count * 16 + j]);
+
+        }
+        printf("\n");
+
+        cur_idx += header_length;
+        m_current_idx += header_length + 1 + body_length;
+        return true;
+    }
+
+
+    bool decodeNULL(const uint8_t* in, size_t inlen){
+        uint32_t cur_idx = 1;
+        uint32_t body_length = 0;
+        size_t header_length = 0;
+        body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
+        printf("offset=%lu h=%lu l=%u:NULL\n", m_current_idx, header_length + 1, body_length);
+
+        cur_idx += header_length;
+        m_current_idx += header_length + 1 + body_length;
+        return true;
+    }
     bool decodeSequence(const uint8_t* in, size_t inlen){
         uint32_t cur_idx = 1;
         uint32_t body_length = 0;
@@ -83,7 +385,7 @@ private:
         body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
         //printf("body|header:%d|%lu\n", body_length, header_length);
         
-        printf("SEQUENCE:offset=%lu h=%lu l=%u\n", m_current_idx, header_length + 1, body_length);
+        printf("offset=%lu h=%lu l=%u:SEQUENCE\n", m_current_idx, header_length + 1, body_length);
         cur_idx += header_length;
         m_current_idx += header_length + 1;// + body_length; cons
         return true;
@@ -94,7 +396,7 @@ private:
         size_t header_length = 0;
         body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
         //printf("body|header:%d|%lu\n", body_length, header_length);
-        printf("SET:offset=%lu h=%lu l=%u\n", m_current_idx, header_length + 1, body_length);
+        printf("offset=%lu h=%lu l=%u:SET\n", m_current_idx, header_length + 1, body_length);
         cur_idx += header_length;
         m_current_idx += header_length + 1;// + body_length; cons
         return true;
@@ -104,7 +406,7 @@ private:
         uint32_t body_length = 0;
         size_t header_length = 0;
         body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
-        printf("INTEGER:offset=%lu h=%lu l=%u\n", m_current_idx, header_length + 1, body_length);
+        printf("offset=%lu h=%lu l=%u:INTEGER\n", m_current_idx, header_length + 1, body_length);
         
         cur_idx += header_length;
         m_current_idx += header_length + 1 + body_length;
@@ -117,13 +419,13 @@ private:
         uint32_t body_length = 0;
         size_t header_length = 0;
         body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
-        printf("ObjectIdentifier:offset=%lu h=%lu l=%u", m_current_idx, header_length + 1, body_length);
+        printf("offset=%lu h=%lu l=%u:", m_current_idx, header_length + 1, body_length);
         
         unsigned y = 0;
         unsigned t = 0;
         cur_idx += header_length;
         m_current_idx += header_length + 1 + body_length;
-        unsigned long* words = new unsigned long[body_length];
+        unsigned long* words = new unsigned long[body_length + 1];
         while(body_length--){
             t = (t << 7) | (in[cur_idx] & 0x7F);
             if (!(in[cur_idx++] & 0x80)){
@@ -145,13 +447,24 @@ private:
         
         unsigned i = 0;
         //printf("value:");
+        std::string oid = "";
         for (i = 0; i < y; i++){
+          char temp[32] = { 0 };
             printf("%lu", words[i]);
+            oid += ltoa(words[i], temp, 10);
             if (i < y -1){
                 printf(".");
+                oid += ".";
             }
             else{
-                printf("\n");
+                std::map<std::string, std::string>::iterator it = OID_MAP.find(oid);
+                if (it != OID_MAP.end()){
+                    printf(":%s", it->second.c_str());
+                }
+                else{
+                    printf(":Unknown");
+                }
+                printf(":OBJECT\n");
             }
         }
         
@@ -217,16 +530,19 @@ bool DerValue::decode(){
             //parse_fail = true;
             break;
         case ASN1_TAG_BITSTRING:
-            printf("BITSTRINE\n");
-            parse_fail = true;
+            //printf("BITSTRINE\n");
+            //parse_fail = true;
+            decodeBitString(m_buffer + m_current_idx, m_buffer_size - m_current_idx);
             break;
         case ASN1_TAG_OCTESTRING:
-            printf("OCTESTRING\n");
-            parse_fail = true;
+            //printf("OCTESTRING\n");
+            //parse_fail = true;
+            decodeOctetString(m_buffer + m_current_idx, m_buffer_size - m_current_idx);
             break;
         case ASN1_TAG_NULL:
-            printf("NULL\n");
-            parse_fail = true;
+            //printf("NULL\n");
+            //parse_fail = true;
+            decodeNULL(m_buffer + m_current_idx, m_buffer_size - m_current_idx);
             break;
         case ASN1_TAG_OBJECTID:
             //printf("Object Identifier\n");
@@ -241,8 +557,9 @@ bool DerValue::decode(){
             parse_fail = true;
             break;
         case ASN1_TAG_PRINTABLESTRING:
-            printf("PRINTABLESTRING\n");
-            parse_fail = true;
+            //printf("PRINTABLESTRING\n");
+            //parse_fail = true;
+            decodePrintableString(m_buffer + m_current_idx, m_buffer_size - m_current_idx);
             break;
         case ASN1_TAG_T61STRING:
             printf("T61STRING\n");
@@ -253,8 +570,9 @@ bool DerValue::decode(){
             parse_fail = true;
             break;
         case ASN1_TAG_UTCTIME:
-            printf("UTCTIME\n");
-            parse_fail = true;
+            //printf("UTCTIME\n");
+            //parse_fail = true;
+            decodeUTCTime(m_buffer + m_current_idx, m_buffer_size - m_current_idx);
             break;
         case ASN1_TAG_GENERALIZEDTIME:
             printf("GENERALIZEDTIME\n");
