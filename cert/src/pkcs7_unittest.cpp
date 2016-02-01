@@ -9,6 +9,7 @@
 
 using namespace std;
 
+/*
 TEST(IndependentMethod, ResetsZero){
     //cout << "Hello" << endl;
     int i = 0;
@@ -22,6 +23,7 @@ TEST(IndependentMethod, ResetsZero2){
     int i = 0;
     EXPECT_EQ(0,i);
 }
+*/
 
 class PKCS7Test:public ::testing::Test{
 protected:
