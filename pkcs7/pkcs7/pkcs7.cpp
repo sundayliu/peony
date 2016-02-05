@@ -33,7 +33,13 @@ std::map<std::string, std::string> OID_MAP = {
   { "2.5.4.11", "organizationalUnitName" },
   { "2.5.4.3", "commonName" },
   { "1.2.840.113549.1.1.1", "RSA encryption" },
-  {"2.5.29.14", "X509v3 Subject Key Identifier"}
+  {"2.5.29.14", "X509v3 Subject Key Identifier"},
+  {"1.2.840.10040.4.3", "dsaWithSHA1"},
+  {"1.2.840.10040.4.1", "dsaEncryption"},
+  {"2.16.840.1.101.3.4.2.1", "sha256"},
+  { "1.2.840.10045.4.3.2", "ecdsa-with-SHA256" },
+  {"1.2.840.10045.2.1", "id-ecPublicKey"},
+  {"1.2.840.10045.3.1.7", "secp256r1"}
 };
 
 namespace tp{
@@ -254,7 +260,7 @@ private:
         uint32_t body_length = 0;
         size_t header_length = 0;
         body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
-        printf("offset=%lu h=%lu l=%u:UTCTime\n", m_current_idx, header_length + 1, body_length);
+        printf("offset=%lu h=%lu l=%u:", m_current_idx, header_length + 1, body_length);
         {
             // parse utc time
             uint8_t buf[32] = { 0 };
@@ -276,11 +282,12 @@ private:
             uint32_t i = 0;
             DECODE_V(utctime.YY, 100);
             DECODE_V(utctime.MM, 13);
-            DECODE_V(utctime->DD, 32);
+            DECODE_V(utctime.DD, 32);
             DECODE_V(utctime.hh, 24);
             DECODE_V(utctime.mm, 60);
             if (buf[i] == 'Z'){
                 // end
+                utctime.off_dir = 'Z';
             }
             else if (buf[i] == '+' || buf[i] == '-'){
                 utctime.off_dir = (buf[i++] == '+') ? 0 : 1;
@@ -291,6 +298,7 @@ private:
                 DECODE_V(utctime.ss, 60);
                 if (buf[i] == 'Z'){
                     // end;
+                    utctime.off_dir = 'Z';
                 }
                 else if (buf[i] == '+' || buf[i] == '-'){
                     utctime.off_dir = (buf[i++] == '+') ? 0 : 1;
@@ -298,6 +306,17 @@ private:
                     DECODE_V(utctime.off_mm, 60);
                 }
             }
+
+            printf("%02d%02d%02d%02d%02d%02d", utctime.YY, utctime.MM, utctime.DD, utctime.hh, utctime.mm, utctime.ss);
+            if (utctime.off_dir == 'Z'){
+                printf("%c", utctime.off_dir);
+            }
+            else{
+                printf("%c", utctime.off_dir ? '+' : '-');
+                printf("%02d%02d", utctime.off_hh, utctime.off_mm);
+            }
+
+            printf(":UTCTIME\n");
         }
 
         cur_idx += header_length;
@@ -406,7 +425,12 @@ private:
         uint32_t body_length = 0;
         size_t header_length = 0;
         body_length = decodeLength(in + cur_idx, inlen - cur_idx, header_length);
-        printf("offset=%lu h=%lu l=%u:INTEGER\n", m_current_idx, header_length + 1, body_length);
+        printf("offset=%lu h=%lu l=%u:", m_current_idx, header_length + 1, body_length);
+        for (uint32_t i = 0; i < body_length; i++){
+            printf("%02X", in[header_length + 1 + i]);
+        }
+
+        printf(":INTEGER\n");
         
         cur_idx += header_length;
         m_current_idx += header_length + 1 + body_length;
@@ -602,7 +626,7 @@ bool DerValue::decode(){
                 body_length = decodeLength(m_buffer + m_current_idx + 1, m_buffer_size - m_current_idx - 1, header_length);
                 //printf("constructed[%d]\n", m_tag & 0x20);
                 //printf("body|header:%u|%lu\n", body_length, header_length);
-                printf("offset=%lu h=%lu l=%u:cons\n", m_current_idx, header_length + 1, body_length);
+                printf("offset=%lu h=%lu l=%u:cons[%X]\n", m_current_idx, header_length + 1, body_length,m_tag);
                 m_current_idx += header_length + 1;
             }
             else{

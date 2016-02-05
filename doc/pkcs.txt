@@ -1,3 +1,5 @@
+jarsigner -keystore ec.keystore -keypass 123456 -storepass 123456 -signedjar signed.apk in.apk alias
+
 DER格式采用ASN1的DER标准格式
 
 openssl pkcs7 [-inform PEM|DER] [-outform PEM|DER] [-in filename]
