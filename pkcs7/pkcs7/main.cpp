@@ -15,6 +15,46 @@ struct CACHE_SO_ITEM{
     string name;
 };
 
+bool need_verify(const char* name){
+	if (name == NULL){
+		return false;
+	}
+
+	string temp = name;
+	for (string::size_type i = 0; i < temp.size(); i++){
+		if (temp[i] >= 'A' && temp[i] <= 'Z'){
+			temp[i] = temp[i] + 'a' - 'A';
+		}
+	}
+
+	char pattern[3][8] = { 0 };
+	pattern[0][0] = '.', pattern[0][1] = 's', pattern[0][2] = 'o', pattern[0][3] = '\0';
+	pattern[1][0] = '.', pattern[1][1] = 'd', pattern[1][2] = 'e', pattern[1][3] = 'x', pattern[1][4] = '\0';
+	pattern[2][0] = '.', pattern[2][1] = 'd', pattern[2][2] = 'l', pattern[2][3] = 'l', pattern[2][4] = '\0';
+
+	for (int i = 0; i < 3; i++){
+		int len = strlen(pattern[i]);
+		bool match = false;
+		for (int j = 0; j < len; j++){
+			if (temp[temp.size() - j - 1] == pattern[i][len - j - 1]){
+				if (j == len - 1){
+					match = true;
+				}
+				continue;
+			}
+			else{
+				break;
+			}
+		}
+
+		if (match){
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void test(){
     cout << "===test===" << endl;
     cout << LIB_SUFFIX_NAME << endl;
@@ -26,6 +66,10 @@ void test(){
     cout << sizeof(CACHE_SO_ITEM) << endl;
     cout << sizeof(string) << endl;
     cout << "===test===" << endl;
+
+	cout << need_verify("libtersafe.so") << endl;
+	cout << need_verify("libtersafe.dex") << endl;
+	cout << need_verify("libtersafe.png") << endl;
 }
 
 int main(int argc, char* argv[]){
