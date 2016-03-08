@@ -1,0 +1,43 @@
+Signature-Version: 1.0
+Created-By: 1.0 (Android)
+-SHA1-Digest-Manifest: hNAQqZFo2UsMFJua1n1HxWVfal8=
+
+Name: res/layout/main.xml
+SHA1-Digest: YVyJ2h3vlGHFyyrhEDQQRmcWiIA=
+
+Name: res/drawable-xhdpi/ic_launcher.png
+SHA1-Digest: 8SVjD9qjiEUjPz1d3mJ+/xl1zeI=
+
+Name: AndroidManifest.xml
+SHA1-Digest: 7dnbslEJoF+XV8USyEJk0/0OLik=
+
+Name: res/drawable-mdpi/ic_launcher.png
+SHA1-Digest: Z2m0AoD9Hb49irqOZJhyLV4dIls=
+
+Name: lib/x86/libJasper.so
+SHA1-Digest: ER9iuSyN9CWoKJGMj3hGLJa0TuU=
+
+Name: res/layout/listview_item_log.xml
+SHA1-Digest: cIW5VM93be4YwLJRrmmqa5PWXUw=
+
+Name: res/drawable-hdpi/ic_launcher.png
+SHA1-Digest: 84JzTBywgzVeXA6bEQJuUxruq8g=
+
+Name: res/drawable-xxxhdpi/ic_launcher.png
+SHA1-Digest: b4AGv7er2IJCO4OsdIVINtklcTg=
+
+Name: resources.arsc
+SHA1-Digest: 76jR/B9YfQzAZpXzXUroDjM/XWw=
+
+Name: classes.dex
+SHA1-Digest: e9cknoEoUQaQnVuo3EbzJ0vjHK8=
+
+Name: res/drawable-xxhdpi/ic_launcher.png
+SHA1-Digest: sY9ZZdCD3hWW8xU1XS1TrHWtiag=
+
+Name: lib/armeabi/libJasper.so
+SHA1-Digest: xrwWKD/+ZpTUSyTHs1aMMR99FSQ=
+
+Name: res/drawable-ldpi/ic_launcher.png
+SHA1-Digest: U4QVwZD6qN2gWknEPlOAnBP4gcw=
+

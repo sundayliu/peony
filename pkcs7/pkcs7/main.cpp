@@ -15,6 +15,13 @@ struct CACHE_SO_ITEM{
     string name;
 };
 
+struct CACHE_IPA_ITEM{
+    int64_t size;
+    uint64_t mtime;
+    uint64_t ctime;
+    uint8_t digest[20];
+};
+
 bool need_verify(const char* name){
 	if (name == NULL){
 		return false;
@@ -60,6 +67,19 @@ void test(){
     cout << LIB_SUFFIX_NAME << endl;
     cout << LIB_SUFFIX_LEN << endl;
 
+    CACHE_IPA_ITEM ipa1 = { 0 };
+    {
+        CACHE_IPA_ITEM temp;
+        temp.size = 100;
+        temp.ctime = 0;
+        temp.mtime = 0;
+        memset(temp.digest, 0x31, sizeof(temp.digest));
+        ipa1 = temp;
+    }
+
+    cout << ipa1.size << endl;
+    cout << ipa1.digest[19] << endl;
+
     string test = "TEST\0TESTHELLO";
     cout << test << endl;
 
@@ -73,14 +93,14 @@ void test(){
 }
 
 int main(int argc, char* argv[]){
-    test();
-    return 0;
+    //test();
+    //return 0;
     cout << "=====PKCS7 Parser=====" << endl;
 
-    //tp::crypto::PKCS7* pkcs7 = new tp::crypto::PKCS7("../data/test.RSA");
-    //if (pkcs7 != NULL){
-    //    delete pkcs7;
-    //}
+    tp::crypto::PKCS7* pkcs7 = new tp::crypto::PKCS7("../data/test.RSA");
+    if (pkcs7 != NULL){
+        delete pkcs7;
+    }
 
     //cout << "=====CERT.DSA=====" << endl;
     //tp::crypto::PKCS7* dsa = new tp::crypto::PKCS7("../data/CERT.DSA");
@@ -88,11 +108,11 @@ int main(int argc, char* argv[]){
     //    delete dsa;
     //}
 
-    cout << "=====TEST.EC=====" << endl;
-    tp::crypto::PKCS7* ec = new tp::crypto::PKCS7("../data/TEST.EC");
-    if (ec != NULL){
-        delete ec;
-    }
+    //cout << "=====TEST.EC=====" << endl;
+    //tp::crypto::PKCS7* ec = new tp::crypto::PKCS7("../data/TEST.EC");
+    //if (ec != NULL){
+    //    delete ec;
+    //}
 
     return 0;
 }

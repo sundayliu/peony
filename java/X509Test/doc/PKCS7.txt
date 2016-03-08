@@ -1,0 +1,60 @@
+ContentInfo ::= SEQUENCE{
+	contentType ContentType,
+	content
+		[0] EXPLICIT ANY DEFINED BY contentType OPTIONAL
+}
+ContentType ::= OBJECT IDENTIFIER
+
+Data content type
+Data	::= OCTET STRING
+
+Signed-data content type
+
+SignedData ::= SEQUENCE{
+	version Version,
+	digestAlgorithms DigestAlgorithmIdentifiers,
+	contentInfo ContentInfo,
+	certificates
+		[0] IMPLICIT ExtendedCertificatesAndCertificates OPTIONAL,
+	crls
+		[1] IMPLICIT CertificateRevocationLists OPTIONAL,
+	signerInfos SIgnerInfos
+}
+
+IssuerAndSerialNumber ::= SEQUENCE {
+issuer Name,
+serialNumber CertificateSerialNumber 
+}
+
+KeyEncryptionAlgorithmIdentifier ::=AlgorithmIdentifier
+Version ::= INTEGER
+
+ContentEncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
+DigestAlgorithmIdentifier ::= AlgorithmIdentifier
+DigestEncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
+
+ExtendedCertificateOrCertificate ::= CHOICE 
+{
+certificate Certificate, -- X.509
+extendedCertificate [0] IMPLICIT ExtendedCertificate 
+}
+
+ExtendedCertificatesAndCertificates ::= SET OF ExtendedCertificateOrCertificate
+
+CertificateRevocationLists ::= SET OF CertificateRevocationList
+DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
+SignerInfos := SET OF SignerInfo
+
+SignerInfo ::= SEQUENCE{
+	version Version,
+	issuerAndSerialNumber IssuerAndSerialNumber,
+	digestAlgorithm DigestAlgorithmIdentifier,
+	authenticatedAttributes  [0] IMPLICIT Attributes OPTIONAL,
+	digestEncryptionAlgorithm	DigestEncryptionAlgorithmIdentifier,
+	encryptedDigest EncryptedDigest,
+	unauthenticatedAttributes
+		[1] IMPLICIT Attributes OPTIONAL
+
+}
+
+EncryptedDigest ::= OCTET STRING

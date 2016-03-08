@@ -16,6 +16,8 @@
 # Fortran module files
 *.mod
 
+*.apk
+
 # Compiled Static libraries
 *.lai
 *.la
@@ -35,3 +37,4 @@ Release/
 build/
 bin/
 out/
+
