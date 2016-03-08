@@ -690,7 +690,8 @@ PKCS7::PKCS7(const std::string& filename):
     m_data(NULL),
     m_data_size(0),
     m_valid(false),
-    m_filename(filename){
+    m_filename(filename),
+    m_oldStyle(false){
     FILE* fp = fopen(m_filename.c_str(), "rb");
     if (fp != NULL){
         fseek(fp, 0, SEEK_END);
@@ -713,13 +714,35 @@ PKCS7::PKCS7(const std::string& filename):
     else{
         printf("fopen fail error:%s\n", strerror(errno));
     }
+
+    /////////////////////////////////////////////////
+    /////////////////////////////////////////////////
+    fp = fopen(m_filename.c_str(), "rb");
+    if (fp != NULL){
+        fseek(fp, 0, SEEK_END);
+        long filesize = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+        if (filesize > 0){
+            uint8_t* data = new uint8_t[filesize];
+            if (data != NULL){
+                if (fread(data, 1, filesize, fp) == filesize){
+                    DerInputStream derin(data, filesize);
+                    parse(derin);
+                }
+                delete[] data;
+            }
+        }
+
+        fclose(fp);
+    }
 }
 
-PKCS7::PKCS7(const uint8_t* data, size_t len):
+PKCS7::PKCS7(const uint8_t* data, size_t len) :
     m_data(NULL),
     m_data_size(0),
     m_valid(false),
-    m_filename("")
+    m_filename(""),
+    m_oldStyle(false)
 {
     if (data == NULL || len <= 0){
         return;
@@ -731,6 +754,10 @@ PKCS7::PKCS7(const uint8_t* data, size_t len):
         m_data_size = len;
         m_valid = parse();
     }
+
+    ////////////////////////////////////////////////
+    DerInputStream derin(data, len);
+    parse(derin);
 }
 
 bool PKCS7::parse(){
@@ -751,6 +778,21 @@ PKCS7::~PKCS7(){
         delete[] m_data;
         m_data = NULL;
     }
+}
+
+
+bool PKCS7::parse(const DerInputStream& derin){
+    bool result = parse(derin, false);
+    if (!result){
+
+        result = parse(derin, true);
+        m_oldStyle = true;
+    }
+    return result;
+}
+
+bool PKCS7::parse(const DerInputStream& derin, bool oldStyle){
+    return false;
 }
     
 }

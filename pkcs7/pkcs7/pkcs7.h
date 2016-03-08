@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include "DerInputStream.h"
+
 namespace tp{
 namespace crypto{
 
@@ -55,10 +57,6 @@ namespace crypto{
     };
 
     class DerOutputStream{
-
-    };
-
-    class DerInputStream{
 
     };
 
@@ -114,8 +112,8 @@ public:
     }
     
 private:
-    void parse(const DerInputStream& derin);
-    void parse(const DerInputStream& derin, bool oldStyle);
+    bool parse(const DerInputStream& derin);
+    bool parse(const DerInputStream& derin, bool oldStyle);
     bool parse();
     PKCS7(const PKCS7&);
     PKCS7& operator=(const PKCS7&);
