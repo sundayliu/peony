@@ -80,17 +80,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ByteArrayOutputStream.cpp" />
+    <ClCompile Include="ContentInfo.cpp" />
     <ClCompile Include="DerInputBuffer.cpp" />
     <ClCompile Include="DerInputStream.cpp" />
     <ClCompile Include="DerOutputStream.cpp" />
+    <ClCompile Include="DerValue.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObjectIdentifier.cpp" />
+    <ClCompile Include="OutputStream.cpp" />
     <ClCompile Include="pkcs7.cpp" />
+    <ClCompile Include="TPException.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ByteArrayOutputStream.h" />
+    <ClInclude Include="ContentInfo.h" />
     <ClInclude Include="DerInputBuffer.h" />
     <ClInclude Include="DerInputStream.h" />
     <ClInclude Include="DerOutputStream.h" />
+    <ClInclude Include="DerValue.h" />
+    <ClInclude Include="ObjectIdentifier.h" />
+    <ClInclude Include="OutputStream.h" />
     <ClInclude Include="pkcs7.h" />
+    <ClInclude Include="TPException.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

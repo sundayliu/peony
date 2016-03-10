@@ -45,8 +45,8 @@ std::map<std::string, std::string> OID_MAP = {
 namespace tp{
 namespace crypto{
 
-#define ASN1_TAG_CLASS_UNIVERSAL 0x000     // UNIVERSALçš„Tagæ˜¯ASN.1æ ‡å‡†å®šä¹‰çš„ï¼Œç»™æ¯ä¸€ç§å†…å»ºç±»å‹å®šä¹‰ä¸€ä¸ªå›ºå®štagå€¼
-#define ASN1_TAG_CLASS_APPLICATION 0x040   // APPLICATIONçš„Tagï¼Œå”¯ä¸€æ ‡å¿—åº”ç”¨å†…çš„ä¸€ä¸ªç±»å‹,ä½†æ˜¯å› ä¸ºä½¿ç”¨IMPORTSç­‰æ–¹å¼ä¸‹ï¼Œå¾ˆéš¾ä¿è¯å”¯ä¸€æ€§ï¼Œæ‰€ä»¥è¿™ç§Tagç±»å·²ç»ä¸æ¨èä½¿ç”¨äº† Order-number ::= [APPLICATION 0] NumericString
+#define ASN1_TAG_CLASS_UNIVERSAL 0x000     // UNIVERSALµÄTagÊÇASN.1±ê×¼¶¨ÒåµÄ£¬¸øÃ¿Ò»ÖÖÄÚ½¨ÀàĞÍ¶¨ÒåÒ»¸ö¹Ì¶¨tagÖµ
+#define ASN1_TAG_CLASS_APPLICATION 0x040   // APPLICATIONµÄTag£¬Î¨Ò»±êÖ¾Ó¦ÓÃÄÚµÄÒ»¸öÀàĞÍ,µ«ÊÇÒòÎªÊ¹ÓÃIMPORTSµÈ·½Ê½ÏÂ£¬ºÜÄÑ±£Ö¤Î¨Ò»ĞÔ£¬ËùÒÔÕâÖÖTagÀàÒÑ¾­²»ÍÆ¼öÊ¹ÓÃÁË Order-number ::= [APPLICATION 0] NumericString
 #define ASN1_TAG_CLASS_CONTEXT 0x080
 #define ASN1_TAG_CLASS_PRIVATE 0x0C0
 
@@ -229,10 +229,10 @@ typedef struct{
     uint32_t off_mm;
 }tp_utctime;
     
-class DerValue{
+class DerValue2{
 public:
-    DerValue(const uint8_t* data, size_t len);
-    ~DerValue();
+    DerValue2(const uint8_t* data, size_t len);
+    ~DerValue2();
     
     bool decode();
     bool encode();
@@ -475,7 +475,7 @@ private:
         for (i = 0; i < y; i++){
           char temp[32] = { 0 };
             printf("%lu", words[i]);
-            oid += ltoa(words[i], temp, 10);
+            oid += _ltoa(words[i], temp, 10);
             if (i < y -1){
                 printf(".");
                 oid += ".";
@@ -505,7 +505,7 @@ private:
     
 };
 
-DerValue::DerValue(const uint8_t* data, size_t len):
+DerValue2::DerValue2(const uint8_t* data, size_t len):
     m_tag(0),
     m_length(-1),
     m_buffer(NULL),
@@ -521,18 +521,18 @@ DerValue::DerValue(const uint8_t* data, size_t len):
     }
 }
 
-DerValue::~DerValue(){
+DerValue2::~DerValue2(){
     if (m_buffer != NULL){
         delete[] m_buffer;
         m_buffer = NULL;
     }
 }
 
-bool DerValue::decodeBoolean(const uint8_t* in, size_t inlen, bool& out, uint32_t& outlen){
+bool DerValue2::decodeBoolean(const uint8_t* in, size_t inlen, bool& out, uint32_t& outlen){
     return true;
 }
 
-bool DerValue::decode(){
+bool DerValue2::decode(){
     if (m_buffer == NULL || m_buffer_size <= 0){
         return false;
     }
@@ -646,7 +646,7 @@ bool DerValue::decode(){
 }
     
 
-uint32_t DerValue::decodeLength(const uint8_t* data, size_t len, size_t& outlen){
+uint32_t DerValue2::decodeLength(const uint8_t* data, size_t len, size_t& outlen){
     if (data == NULL || len <= 0){
         return -1;
     }
@@ -767,7 +767,7 @@ bool PKCS7::parse(){
     
     printf("pkcs7 data size:%lu\n", m_data_size);
     
-    DerValue der_value(m_data, m_data_size);
+    DerValue2 der_value(m_data, m_data_size);
     der_value.decode();
     
     return true;

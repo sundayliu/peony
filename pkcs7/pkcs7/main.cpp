@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 #include "pkcs7.h"
@@ -67,6 +68,35 @@ void test(){
     cout << LIB_SUFFIX_NAME << endl;
     cout << LIB_SUFFIX_LEN << endl;
 
+    vector<int> values;
+    for (int i = 0; i < 10; i++){
+        values.push_back(i);
+    }
+    {
+        vector<uint8_t> a;
+        vector<uint8_t> b;
+        for (int i = 0; i < 10; i++){
+            a.push_back(i + 'A');
+            b.push_back(i + 'A');
+        }
+
+        vector<uint8_t> c = a;
+        for (unsigned i = 0; i < c.size(); i++){
+            cout << c[i] << " ";
+        }
+        
+    }
+
+    string out = "";
+    for (vector<int>::size_type i = 0; i < values.size(); ++i){
+        char temp[16] = { 0 };
+        sprintf_s(temp, sizeof(temp), "%d", values[i]);
+        out += temp;
+        out += ".";
+    }
+    cout << "ObjectIdentifier: " << out << endl;
+
+
     CACHE_IPA_ITEM ipa1 = { 0 };
     {
         CACHE_IPA_ITEM temp;
@@ -93,8 +123,8 @@ void test(){
 }
 
 int main(int argc, char* argv[]){
-    //test();
-    //return 0;
+    test();
+    return 0;
     cout << "=====PKCS7 Parser=====" << endl;
 
     tp::crypto::PKCS7* pkcs7 = new tp::crypto::PKCS7("../data/test.RSA");
