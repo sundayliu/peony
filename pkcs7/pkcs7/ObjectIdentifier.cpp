@@ -1,4 +1,5 @@
 #include "ObjectIdentifier.h"
+#include "DerInputStream.h"
 
 namespace tp{
     namespace crypto{
@@ -15,6 +16,10 @@ namespace tp{
         }
 
         void ObjectIdentifier::init(const std::vector<int>& values){
+
+        }
+
+        ObjectIdentifier::ObjectIdentifier(const DerInputStream& derin){
 
         }
     }

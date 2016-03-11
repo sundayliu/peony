@@ -48,5 +48,9 @@ namespace tp{
                 m_buffer = new DerInputBuffer(temp);
             }
         }
+
+        bool DerValue::toByteArray(std::vector<uint8_t>& out){
+            return true;
+        }
     }
 }

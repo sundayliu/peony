@@ -34,7 +34,7 @@ namespace tp{
                 return ((m_tag & 0x01f) == constructedTag);
             }
         public:
-            DerValue();
+            DerValue(){};
             DerValue(const std::string& value);
             DerValue(const std::vector<uint8_t>& value);
             DerValue(uint8_t stringTag, const std::vector<uint8_t>& value);

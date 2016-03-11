@@ -12,17 +12,13 @@
 #include <vector>
 
 #include "DerInputStream.h"
+#include "ObjectIdentifier.h"
+#include "ContentInfo.h"
 
 namespace tp{
 namespace crypto{
 
-    class Serializable{
-
-    };
-
-    class ObjectIdentifier : public Serializable{
-
-    };
+    
 
     class BigInteger{
 
@@ -32,9 +28,7 @@ namespace crypto{
 
     };
 
-    class ContentInfo{
-
-    };
+    
 
     class X509Certificate{
 
@@ -52,17 +46,13 @@ namespace crypto{
 
     };
 
-    class OutputStream{
-
-    };
-
-    class DerOutputStream{
-
-    };
-
     class X500Name{
 
     };
+
+    class OutputStream;
+    class ContentInfo;
+    class ObjectIdentifier;
 class PKCS7{
 public:
     PKCS7(const std::string& filename);
@@ -112,8 +102,8 @@ public:
     }
     
 private:
-    bool parse(const DerInputStream& derin);
-    bool parse(const DerInputStream& derin, bool oldStyle);
+    bool parse(DerInputStream& derin);
+    bool parse(DerInputStream& derin, bool oldStyle);
     bool parse();
     PKCS7(const PKCS7&);
     PKCS7& operator=(const PKCS7&);

@@ -11,6 +11,7 @@ namespace tp{
     namespace crypto{
         class ContentInfo{
         public:
+            ContentInfo(){}
             ContentInfo(const ObjectIdentifier& contentType, const DerValue& content):
             m_contentType(contentType),
             m_content(content){
@@ -39,6 +40,19 @@ namespace tp{
                 std::vector<uint8_t> out;
                 type.toByteArray(out);
                 disType = new DerInputStream(out);
+                m_contentType = disType->getOID();
+                if (oldStyle){
+                    m_content = typeAndContent[1];
+                }
+                else{
+                    if (typeAndContent.size() > 1){
+                        taggedContent = typeAndContent[1];
+                        taggedContent.toByteArray(out);
+                        disTaggedContent = new DerInputStream(out);
+                        disTaggedContent->getSet(1, true, contents);
+                        m_content = contents[0];
+                    }
+                }
                 
             }
 

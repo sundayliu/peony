@@ -1,5 +1,6 @@
 #include "DerInputStream.h"
 #include <limits.h>
+#include "ObjectIdentifier.h"
 
 namespace tp{
     namespace crypto{
@@ -65,6 +66,20 @@ namespace tp{
 
         void DerInputStream::init(const std::vector<uint8_t>& data, int offset, int len){
 
+        }
+
+        ObjectIdentifier DerInputStream::getOID(){
+            return ObjectIdentifier(*this);
+        }
+
+        bool DerInputStream::getSet(int startLen, bool implicit, std::vector<DerValue>& out){
+            m_tag = m_buffer->read();
+            if (!implicit){
+                if (m_tag != DerValue::tag_Set){
+                    return false;
+                }
+            }
+            return readVector(startLen, out);
         }
     }
 }

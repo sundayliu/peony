@@ -32,6 +32,10 @@ namespace crypto{
         }
 
     public:
+        ObjectIdentifier getOID();
+
+    public:
+        bool getSet(int startLen, bool implicit, std::vector<DerValue>& out);
         bool  getSequence(int startLen, std::vector<DerValue>& out){
             if (m_buffer != NULL){
                 m_tag = m_buffer->read();

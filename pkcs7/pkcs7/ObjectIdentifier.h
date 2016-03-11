@@ -11,12 +11,15 @@
 
 namespace tp{
     namespace crypto{
+        class DerInputStream;
         class ObjectIdentifier{
         public:
             ObjectIdentifier(){
 
             }
+            ObjectIdentifier(const DerInputStream& derin);
             ObjectIdentifier(const std::vector<int>& values);
+            ObjectIdentifier(const std::string& oid);
             ObjectIdentifier(const ObjectIdentifier& obj){
                 m_stringForm = obj.m_stringForm;
                 m_encoding = obj.m_encoding;

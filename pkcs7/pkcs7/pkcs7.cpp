@@ -11,6 +11,10 @@
 #include <map>
 #include <string>
 
+#include "OutputStream.h"
+#include "DerOutputStream.h"
+#include "ObjectIdentifier.h"
+
 
 /*
 1.2.840.113549.1.7.1 - data
@@ -781,7 +785,7 @@ PKCS7::~PKCS7(){
 }
 
 
-bool PKCS7::parse(const DerInputStream& derin){
+bool PKCS7::parse(DerInputStream& derin){
     bool result = parse(derin, false);
     if (!result){
 
@@ -791,7 +795,8 @@ bool PKCS7::parse(const DerInputStream& derin){
     return result;
 }
 
-bool PKCS7::parse(const DerInputStream& derin, bool oldStyle){
+bool PKCS7::parse(DerInputStream& derin, bool oldStyle){
+    m_contentInfo = ContentInfo(derin, oldStyle);
     return false;
 }
     
