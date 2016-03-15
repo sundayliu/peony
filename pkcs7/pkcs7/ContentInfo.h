@@ -12,6 +12,18 @@ namespace tp{
         class ContentInfo{
         public:
             ContentInfo(){}
+
+            ContentInfo(const ContentInfo& other){
+                m_contentType = other.m_contentType;
+                m_content = other.m_content;
+            }
+
+            void operator=(const ContentInfo& other){
+                if (this != &other){
+                    m_content = other.m_content;
+                    m_contentType = other.m_contentType;
+                }
+            }
             ContentInfo(const ObjectIdentifier& contentType, const DerValue& content):
             m_contentType(contentType),
             m_content(content){

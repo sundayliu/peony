@@ -10,20 +10,17 @@ namespace tp{
 namespace crypto{
 
     class DerInputBuffer;
+    class BigInteger;
     class DerInputStream{
     public:
-        DerInputStream(){}
+        DerInputStream(){ m_buffer = NULL; m_tag = 0; }
         DerInputStream(const uint8_t* data, size_t length);
         DerInputStream(const std::vector<uint8_t>& data);
         DerInputStream(const std::vector<uint8_t>& data, int offset, int len);
         DerInputStream(const DerInputBuffer& buf);
-        DerInputStream(const DerInputStream& obj){
+        DerInputStream(const DerInputStream& obj);
 
-        }
-
-        void operator=(const DerInputStream& obj){
-
-        }
+        void operator=(const DerInputStream& obj);
         ~DerInputStream(){
             if (m_buffer != NULL){
                 delete m_buffer;
@@ -33,8 +30,20 @@ namespace crypto{
 
     public:
         ObjectIdentifier getOID();
+        BigInteger getBigInteger();
+        DerValue getDerValue();
+
+        bool getOctetString(std::vector<uint8_t>& out);
 
     public:
+        int getByte(){
+            return (0x00ff & m_buffer->read());
+        }
+
+        void getBytes(std::vector<uint8_t>& out, int len){
+            m_buffer->read(out, len);
+        }
+        bool DerInputStream::getSet(int startLen, std::vector<DerValue>& out);
         bool getSet(int startLen, bool implicit, std::vector<DerValue>& out);
         bool  getSequence(int startLen, std::vector<DerValue>& out){
             if (m_buffer != NULL){
@@ -52,6 +61,12 @@ namespace crypto{
             }
         }
 
+        int peekByte(){
+            int out = -1;
+            m_buffer->peek(&out);
+            return out;
+        }
+
         void mark(int value){
             if (m_buffer != NULL){
                 m_buffer->mark(value);
@@ -66,6 +81,14 @@ namespace crypto{
         }
 
         DerInputStream* subStream(int len, bool do_skip);
+
+        int getLength(){
+            return getLength(*m_buffer);
+        }
+
+        static int getLength(DerInputBuffer& buffer){
+            return getLength(buffer.read(), buffer);
+        }
 
     protected:
         bool readVector(int startLen, std::vector<DerValue>& out){
@@ -97,7 +120,7 @@ namespace crypto{
                 DerValue value(*(newstr->m_buffer));
                 out.push_back(value);
                 startLen--;
-            } while (startLen > 0 && newstr->available() > 0);
+            } while (newstr->available() > 0);
             return true;
         }
 

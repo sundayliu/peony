@@ -34,7 +34,12 @@ namespace tp{
                 return ((m_tag & 0x01f) == constructedTag);
             }
         public:
-            DerValue(){};
+            DerValue(){
+                m_buffer = NULL;
+                m_data = NULL;
+                m_length = 0;
+                m_tag = 0;
+            };
             DerValue(const std::string& value);
             DerValue(const std::vector<uint8_t>& value);
             DerValue(uint8_t stringTag, const std::vector<uint8_t>& value);
@@ -42,6 +47,9 @@ namespace tp{
             DerValue(DerInputBuffer& input);
             DerValue(std::vector<uint8_t>& buf);
             DerValue(std::vector<uint8_t>& buf, int offset, int len);
+
+            DerValue(const DerValue& other); 
+            void operator=(const DerValue& other);
 
         private:
             DerInputStream init(uint8_t stringTag, std::vector<uint8_t>& data);

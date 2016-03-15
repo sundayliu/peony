@@ -59,6 +59,27 @@ public:
         }
     }
 
+    int read(std::vector<uint8_t>& out, int len){
+        if (m_pos >= m_count){
+            return -1;
+        }
+
+        int avail = m_count - m_pos;
+        if (len > avail){
+            len = avail;
+        }
+
+        if (len <= 0){
+            return 0;
+        }
+
+        for (int i = 0; i < len; i++){
+            out.push_back(m_buf[m_pos + i]);
+        }
+        m_pos += len;
+        return len;
+    }
+
     int available()const{
         return m_count - m_pos;
     }

@@ -23,6 +23,43 @@ struct CACHE_IPA_ITEM{
     uint8_t digest[20];
 };
 
+class TestStream{
+public:
+    virtual void write(uint8_t byte) = 0;
+};
+
+class TestByteStream:public TestStream{
+public:
+    TestByteStream(){
+        m_count = 0;
+        m_buf.reserve(32);
+    }
+    virtual void write(uint8_t byte){
+        m_buf.push_back(byte);
+        m_count++;
+    }
+
+private:
+    std::vector<uint8_t> m_buf;
+    size_t m_count;
+};
+
+class TestDerStream:public TestByteStream{
+public:
+    TestDerStream(){}
+
+    virtual void write(uint8_t data){
+        TestByteStream::write(data);
+    }
+
+    void write(uint8_t tag, const std::vector<uint8_t>& buf){
+
+    }
+    void write(uint8_t tag, TestDerStream& out){
+
+    }
+};
+
 bool need_verify(const char* name){
 	if (name == NULL){
 		return false;
@@ -64,6 +101,9 @@ bool need_verify(const char* name){
 }
 
 void test(){
+    TestDerStream der;
+    uint8_t data = 'a';
+    der.write(data);
     cout << "===test===" << endl;
     cout << LIB_SUFFIX_NAME << endl;
     cout << LIB_SUFFIX_LEN << endl;
@@ -124,7 +164,7 @@ void test(){
 
 int main(int argc, char* argv[]){
     test();
-    return 0;
+    //return 0;
     cout << "=====PKCS7 Parser=====" << endl;
 
     tp::crypto::PKCS7* pkcs7 = new tp::crypto::PKCS7("../data/test.RSA");

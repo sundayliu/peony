@@ -80,8 +80,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AlgorithmId.cpp" />
+    <ClCompile Include="BigInteger.cpp" />
     <ClCompile Include="ByteArrayOutputStream.cpp" />
+    <ClCompile Include="Certificate.cpp" />
     <ClCompile Include="ContentInfo.cpp" />
+    <ClCompile Include="CRL.cpp" />
     <ClCompile Include="DerInputBuffer.cpp" />
     <ClCompile Include="DerInputStream.cpp" />
     <ClCompile Include="DerOutputStream.cpp" />
@@ -90,11 +94,21 @@
     <ClCompile Include="ObjectIdentifier.cpp" />
     <ClCompile Include="OutputStream.cpp" />
     <ClCompile Include="pkcs7.cpp" />
+    <ClCompile Include="PKCS9Attribute.cpp" />
+    <ClCompile Include="PKCS9Attributes.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="SignerInfo.cpp" />
     <ClCompile Include="TPException.cpp" />
+    <ClCompile Include="X509Certificate.cpp" />
+    <ClCompile Include="X509CRL.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AlgorithmId.h" />
+    <ClInclude Include="BigInteger.h" />
     <ClInclude Include="ByteArrayOutputStream.h" />
+    <ClInclude Include="Certificate.h" />
     <ClInclude Include="ContentInfo.h" />
+    <ClInclude Include="CRL.h" />
     <ClInclude Include="DerInputBuffer.h" />
     <ClInclude Include="DerInputStream.h" />
     <ClInclude Include="DerOutputStream.h" />
@@ -102,7 +116,13 @@
     <ClInclude Include="ObjectIdentifier.h" />
     <ClInclude Include="OutputStream.h" />
     <ClInclude Include="pkcs7.h" />
+    <ClInclude Include="PKCS9Attribute.h" />
+    <ClInclude Include="PKCS9Attributes.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="SignerInfo.h" />
     <ClInclude Include="TPException.h" />
+    <ClInclude Include="X509Certificate.h" />
+    <ClInclude Include="X509CRL.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,6 +14,12 @@ namespace tp{
             DerOutputStream(int size) :ByteArrayOutputStream(size){}
 
         public:
+            void write(const std::vector<uint8_t>& data, int off, int len){
+                ByteArrayOutputStream::write(data, off, len);
+            }
+
+
+            void write(uint8_t byte){ ByteArrayOutputStream::write(byte); }
             void write(uint8_t tag, const std::vector<uint8_t>& buf);
             void write(uint8_t tag, DerOutputStream& out);
             void writeImplicit(uint8_t tag, const DerOutputStream& value);

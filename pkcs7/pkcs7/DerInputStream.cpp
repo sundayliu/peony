@@ -1,6 +1,8 @@
 #include "DerInputStream.h"
 #include <limits.h>
 #include "ObjectIdentifier.h"
+#include "BigInteger.h"
+#include "DerValue.h"
 
 namespace tp{
     namespace crypto{
@@ -65,11 +67,41 @@ namespace tp{
         }
 
         void DerInputStream::init(const std::vector<uint8_t>& data, int offset, int len){
-
+            m_buffer = new DerInputBuffer(data, offset, len);
         }
 
         ObjectIdentifier DerInputStream::getOID(){
             return ObjectIdentifier(*this);
+        }
+
+        BigInteger DerInputStream::getBigInteger(){
+            BigInteger result;
+            if (m_buffer->read() == DerValue::tag_Integer){
+                int len = getLength();
+                std::vector<uint8_t> tmp;
+                for (int i = 0; i < len; i++){
+                    tmp.push_back(m_buffer->read());
+                }
+
+                result = BigInteger(tmp);
+            }
+            return result;
+        }
+
+        DerValue DerInputStream::getDerValue(){
+            return DerValue(*m_buffer);
+        }
+
+        bool DerInputStream::getOctetString(std::vector<uint8_t>& out){
+            if (m_buffer->read() != DerValue::tag_OctetString){
+                return false;
+            }
+
+            int length = getLength();
+            if ((length != 0) && (m_buffer->read(out, length) != length)){
+                return false;
+            }
+            return true;
         }
 
         bool DerInputStream::getSet(int startLen, bool implicit, std::vector<DerValue>& out){
@@ -80,6 +112,30 @@ namespace tp{
                 }
             }
             return readVector(startLen, out);
+        }
+
+        bool DerInputStream::getSet(int startLen, std::vector<DerValue>& out){
+            m_tag = m_buffer->read();
+            if (m_tag != DerValue::tag_Set){
+                return false;
+            }
+            return readVector(startLen, out);
+        }
+
+        DerInputStream::DerInputStream(const DerInputStream& other){
+            m_tag = other.m_tag;
+            m_buffer = new DerInputBuffer(*(other.m_buffer));
+        }
+
+        void DerInputStream::operator=(const DerInputStream& other){
+            if (this != &other){
+                m_tag = other.m_tag;
+                if (m_buffer != NULL){
+                    delete m_buffer;
+                }
+
+                m_buffer = new DerInputBuffer(*(other.m_buffer));
+            }
         }
     }
 }

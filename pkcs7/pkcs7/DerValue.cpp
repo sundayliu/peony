@@ -1,6 +1,7 @@
 #include "DerValue.h"
 #include "DerInputStream.h"
 #include "DerInputBuffer.h"
+#include "DerOutputStream.h"
 
 namespace tp{
     namespace crypto{
@@ -46,11 +47,75 @@ namespace tp{
                 m_data = new DerInputStream(temp);
                 temp.skip(m_length);
                 m_buffer = new DerInputBuffer(temp);
+
+                input.skip(m_length);
             }
         }
 
         bool DerValue::toByteArray(std::vector<uint8_t>& out){
+            DerOutputStream os;
+            encode(os);
+            m_data->reset();
+            out = os.toByteArray();
             return true;
+        }
+
+        bool DerValue::encode(DerOutputStream& out){
+            out.write(m_tag);
+            out.putLength(m_length);
+            if (m_length > 0){
+                m_buffer->reset();
+                std::vector<uint8_t> value;
+
+                if (m_buffer->read(value, m_length) == m_length){
+                    out.write(value, 0, m_length);
+                }
+
+            }
+            return true;
+        }
+
+        DerValue::DerValue(const DerValue& other){
+            m_tag = other.m_tag;
+            m_length = other.m_length;
+            m_buffer = new DerInputBuffer(*(other.m_buffer));
+            m_data = new DerInputStream(*(other.m_data));
+
+        }
+
+        void DerValue::operator=(const DerValue& other){
+            if (this != &other){
+                m_tag = other.m_tag;
+                m_length = other.m_length;
+                if (m_data != NULL){
+                    delete m_data;
+                    m_data = NULL;
+                }
+                if (other.m_data != NULL){
+                    m_data = new DerInputStream(*(other.m_data));
+                }
+                else{
+                    m_data = NULL;
+                }
+                
+                if (m_buffer != NULL){
+                    delete m_buffer;
+                    m_buffer = NULL;
+                }
+
+                if (other.m_buffer != NULL){
+                    m_buffer = new DerInputBuffer(*(other.m_buffer));
+                }
+                
+            }
+        }
+
+        bool DerValue::toDerInputStream(DerInputStream& out){
+            if (m_tag == tag_Sequence || m_tag == tag_Set){
+                out = *m_data;
+                return true;
+            }
+            return false;
         }
     }
 }

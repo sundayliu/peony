@@ -14,33 +14,15 @@
 #include "DerInputStream.h"
 #include "ObjectIdentifier.h"
 #include "ContentInfo.h"
+#include "BigInteger.h"
+#include "AlgorithmId.h"
+#include "X509Certificate.h"
+#include "X509CRL.h"
+#include "SignerInfo.h"
 
 namespace tp{
 namespace crypto{
 
-    
-
-    class BigInteger{
-
-    };
-
-    class AlgorithmId{
-
-    };
-
-    
-
-    class X509Certificate{
-
-    };
-
-    class X509CRL{
-
-    };
-
-    class SignerInfo{
-
-    };
 
     class Principal{
 
@@ -104,6 +86,7 @@ public:
 private:
     bool parse(DerInputStream& derin);
     bool parse(DerInputStream& derin, bool oldStyle);
+    bool parseSignedData(DerValue& val);
     bool parse();
     PKCS7(const PKCS7&);
     PKCS7& operator=(const PKCS7&);

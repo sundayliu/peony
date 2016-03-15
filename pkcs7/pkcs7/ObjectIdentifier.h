@@ -12,44 +12,44 @@
 namespace tp{
     namespace crypto{
         class DerInputStream;
+        class DerInputBuffer;
         class ObjectIdentifier{
         public:
             ObjectIdentifier(){
 
             }
-            ObjectIdentifier(const DerInputStream& derin);
-            ObjectIdentifier(const std::vector<int>& values);
+            ObjectIdentifier(DerInputStream& derin);
+            ObjectIdentifier(DerInputBuffer& buf);
+            ObjectIdentifier(const std::vector<uint64_t>& values);
             ObjectIdentifier(const std::string& oid);
             ObjectIdentifier(const ObjectIdentifier& obj){
-                m_stringForm = obj.m_stringForm;
                 m_encoding = obj.m_encoding;
-                m_values = m_values;
+                m_values = obj.m_values;
             }
 
             void operator=(const ObjectIdentifier& obj){
                 if (this != &obj){
-                    m_stringForm = obj.m_stringForm;
-                    m_encoding = m_encoding;
-                    m_values = m_values;
+                    m_encoding = obj.m_encoding;
+                    m_values = obj.m_values;
                 }
             }
+
+            static void check(const std::vector<uint8_t>& encoding);
 
         public:
             bool operator == (const ObjectIdentifier& obj){
                 if (m_values == obj.m_values){
                     return true;
                 }
-                else{
-                    return false;
-                }
+                return false;
             }
 
         public:
             std::string toString(){
                 std::string out = "";
-                for (std::vector<int>::size_type i = 0; i < m_values.size(); i++){
+                for (std::vector<uint64_t>::size_type i = 0; i < m_values.size(); i++){
                     char temp[16] = { 0 };
-                    snprintf(temp, sizeof(temp), "%d", m_values[i]);
+                    snprintf(temp, sizeof(temp), "%"PRIu64, m_values[i]);
                     out += temp;
                     if (i != m_values.size() - 1){
                         out += ".";
@@ -59,7 +59,8 @@ namespace tp{
             }
 
         private:
-            void init(const std::vector<int>& values);
+            void init(const std::vector<uint64_t>& values);
+            void decode();
 
         private:
 
@@ -113,8 +114,7 @@ namespace tp{
 
         private:
             std::vector<uint8_t> m_encoding;
-            std::vector<int> m_values;
-            std::string m_stringForm;
+            std::vector<uint64_t> m_values;
         };
     }
 }

@@ -14,6 +14,9 @@
 #include "OutputStream.h"
 #include "DerOutputStream.h"
 #include "ObjectIdentifier.h"
+#include "BigInteger.h"
+#include "AlgorithmId.h"
+#include <iostream>
 
 
 /*
@@ -706,7 +709,7 @@ PKCS7::PKCS7(const std::string& filename):
             if (m_data != NULL){
                 m_data_size = fread(m_data, 1, filesize, fp);
                 if (m_data_size == filesize){
-                    m_valid = parse();
+                    //m_valid = parse();
                 }
                 else{
                     m_data_size = 0;
@@ -797,7 +800,59 @@ bool PKCS7::parse(DerInputStream& derin){
 
 bool PKCS7::parse(DerInputStream& derin, bool oldStyle){
     m_contentInfo = ContentInfo(derin, oldStyle);
-    return false;
+    m_contentType = m_contentInfo.getContentType();
+    DerValue content = m_contentInfo.getContent();
+
+    std::string id = m_contentType.toString();
+    std::cout << id << std::endl;
+    if (m_contentType == ContentInfo::SIGNED_DATA_OID){
+        
+        parseSignedData(content);
+    }
+    
+
+    //ContentInfo::SIGNED_DATA_OID;
+    return true;
+}
+
+bool PKCS7::parseSignedData(DerValue& val){
+    DerInputStream dis;
+    val.toDerInputStream(dis);
+
+    // Version
+    m_version = dis.getBigInteger();
+    std::vector<DerValue> digestAlgorithmIdVals;
+    dis.getSet(1, digestAlgorithmIdVals);
+
+    ContentInfo contentInfo(dis);
+    m_contentInfo = contentInfo;
+
+    // check if certificates (implicit tag) are provided
+    // certificates ars optional
+    if (dis.peekByte() == 0xA0){
+        std::vector<DerValue> certVals;
+        dis.getSet(2, true, certVals);
+    }
+
+    if (dis.peekByte() == 0xA1){
+        std::vector<DerValue> crlVals;
+        dis.getSet(1, true, crlVals);
+    }
+
+    // signerInfos
+    std::vector<DerValue> signerInfoVals;
+    dis.getSet(1, signerInfoVals);
+    std::vector<DerValue>::iterator it = signerInfoVals.begin();
+    while (it != signerInfoVals.end()){
+        DerInputStream dis;
+        it->toDerInputStream(dis);
+        SignerInfo info(dis);
+        //m_signerInfos.push_back(SignerInfo(dis));
+        m_signerInfos.push_back(dis);
+        ++it;
+    }
+
+    return true;
 }
     
 }
