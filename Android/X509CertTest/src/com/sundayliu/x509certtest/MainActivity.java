@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        verifyCert();
+        //verifyCert();
         //dumpInfo();
         //Log.e(DEBUG_TAG, "Verify result:" + result);
         //DerInputStream s;
